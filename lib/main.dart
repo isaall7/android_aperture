@@ -1,25 +1,35 @@
-import 'package:aperturely_app/app/modules/auth/views/dashboard.dart';
+import 'package:aperturely_app/app/theme/app_theme.dart';
+import 'package:aperturely_app/app/routes/app_pages.dart';
+import 'package:aperturely_app/app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'app/modules/auth/views/login_view.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
-void main() => runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+  runApp(const AperturelyApp());
+}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AperturelyApp extends StatelessWidget {
+  const AperturelyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Aperturely',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        scaffoldBackgroundColor: AppColors.cream,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.accent,
+          background: AppColors.cream,
+        ),
+        fontFamily: 'sans-serif',
       ),
-      home: const BerandaScreen(),
-      routes: {
-        '/beranda': (context) => const BerandaScreen(),
-        '/login': (context) => LoginView(),
-      },
+      initialRoute: Routes.dashboard,
+      getPages: AppPages.routes,
     );
   }
 }

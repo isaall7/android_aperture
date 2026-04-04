@@ -16,14 +16,19 @@ class ApiHelper {
   }
 
   static String getImageUrl(String imagePath) {
+    if (imagePath.isEmpty) {
+      return 'https://ui-avatars.com/api/?name=Aperturely&background=e8e4df&color=888077';
+    }
     if (imagePath.startsWith('http')) {
       return imagePath;
     }
-    return '${BaseUrl.storageUrl}/$imagePath';
+    final normalized =
+        imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
+    return '${BaseUrl.storageUrl}/$normalized';
   }
 
   static bool isSuccessResponse(int? statusCode) {
-    return statusCode == BaseUrl.success || statusCode == BaseUrl.created;
+    return statusCode == 200 || statusCode == 201;
   }
 
   static String getErrorMessage(int? statusCode) {

@@ -9,5 +9,8 @@ class FotoModel {
   String get url => ApiHelper.getImageUrl(photo);
 
   factory FotoModel.fromJson(Map<String, dynamic> j) =>
-      FotoModel(id: j['id'], photo: j['photo']);
+      FotoModel(
+        id: (j['id'] as num?)?.toInt() ?? 0,
+        photo: (j['photo'] ?? '').toString(),
+      );
 }

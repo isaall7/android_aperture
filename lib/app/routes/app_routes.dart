@@ -1,8 +1,9 @@
-import 'package:get/get.dart';
-import 'package:aperturely_app/app/modules/auth/views/dashboard.dart';
-import 'package:aperturely_app/app/modules/auth/views/login_view.dart';
-
 class Routes {
-  static const String BerandaScreen = '/beranda';
-  static const String LOGIN = '/login';
+  static const login = '/login';
+  static const register = '/register';
+  static const dashboard = '/dashboard';
+  static const explore = '/explore';
+  static const trending = '/trending';
+  static const notifications = '/notifications';
+  static const profile = '/profile';
 }

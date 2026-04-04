@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  get: ^4.6.6
+  get_storage: ^2.1.1
 
   # HTTP client
   http: ^1.2.0
@@ -53,8 +55,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  get: ^4.6.5
-  get_storage: ^2.0.3
   flutter_lints: ^3.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to

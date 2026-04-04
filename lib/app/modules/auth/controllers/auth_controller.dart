@@ -10,35 +10,48 @@ class AuthController extends GetxController {
 
   RxBool isLoading = false.obs;
   RxBool isPasswordHidden = true.obs;
+  RxBool isRegisterPasswordHidden = true.obs;
+  RxBool isRegisterConfirmationHidden = true.obs;
 
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
   }
 
+  void toggleRegisterPasswordVisibility() {
+    isRegisterPasswordHidden.value = !isRegisterPasswordHidden.value;
+  }
+
+  void toggleRegisterConfirmationVisibility() {
+    isRegisterConfirmationHidden.value = !isRegisterConfirmationHidden.value;
+  }
+
   Future<void> login(String email, String password) async {
     try {
       isLoading(true);
-      final response = await api.login(email, password);
+      final response = await api.login(email: email, password: password);
+      final statusCode = response['statusCode'] as int?;
+      final body = response['body'] as Map<String, dynamic>? ?? {};
 
-      if (response.statusCode == 200) {
-        final token = response.body['token'];
+      if (statusCode == 200) {
+        final token = (body['access_token'] ?? body['token'])?.toString();
+        if (token == null || token.isEmpty) {
+          throw Exception('Token login tidak ditemukan.');
+        }
         box.write('token', token);
-
-        // Fix navigation - pake offAllNamed dengan proper route
-        Get.offAllNamed(Routes.BerandaScreen);
+        Get.offAllNamed(Routes.dashboard);
 
         Get.snackbar(
           'Berhasil',
-          'Login berhasil! Selamat datang di perpustakaan digital',
-          backgroundColor: const Color(0xFF10B981),
+          'Login berhasil. Selamat datang di Aperturely.',
+          backgroundColor: const Color(0xFF0A0A0A),
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
         );
       } else {
         Get.snackbar(
           'Gagal Login',
-          response.body['message'] ?? 'Email atau password salah',
-          backgroundColor: Colors.red,
+          body['message']?.toString() ?? 'Email atau password salah',
+          backgroundColor: const Color(0xFFC8533A),
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
         );
@@ -47,13 +60,78 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Error',
         'Terjadi kesalahan: ${e.toString()}',
-        backgroundColor: Colors.red,
+        backgroundColor: const Color(0xFFC8533A),
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
       );
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      isLoading(true);
+      final response = await api.register(
+        name: name,
+        email: email,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+      final statusCode = response['statusCode'] as int?;
+      final body = response['body'] as Map<String, dynamic>? ?? {};
+
+      if (statusCode == 200 || statusCode == 201) {
+        final token = (body['access_token'] ?? body['token'])?.toString();
+        if (token != null && token.isNotEmpty) {
+          box.write('token', token);
+        }
+        Get.offAllNamed(Routes.dashboard);
+        Get.snackbar(
+          'Akun Dibuat',
+          'Registrasi berhasil. Selamat datang di Aperturely.',
+          backgroundColor: const Color(0xFF0A0A0A),
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
+
+      final message = _extractErrorMessage(body);
+      Get.snackbar(
+        'Registrasi Gagal',
+        message.isNotEmpty ? message : 'Periksa kembali data pendaftaran.',
+        backgroundColor: const Color(0xFFC8533A),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan: ${e.toString()}',
+        backgroundColor: const Color(0xFFC8533A),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void loginWithGoogle() {
+    Get.snackbar(
+      'Google Login Belum Aktif',
+      'Backend Laravel saat ini baru mendukung Google login lewat redirect web, belum token khusus mobile.',
+      backgroundColor: const Color(0xFF0A0A0A),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 4),
+    );
   }
 
   Future<void> logout() async {
@@ -66,26 +144,39 @@ class AuthController extends GetxController {
         box.remove('token');
       }
 
-      // Clear semua controller yang mungkin cached
-      Get.reset();
-
-      // Navigate ke login
-      Get.offAllNamed(Routes.LOGIN);
+      box.remove('token');
+      Get.offAllNamed(Routes.dashboard);
 
       Get.snackbar(
         'Logout',
-        'Anda telah keluar dari sistem',
+        'Anda telah keluar dari akun.',
         backgroundColor: const Color(0xFF6B7280),
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
       );
     } catch (e) {
-      // Tetap logout meski API gagal
       box.remove('token');
-      Get.reset();
-      Get.offAllNamed(Routes.LOGIN);
+      Get.offAllNamed(Routes.dashboard);
     } finally {
       isLoading(false);
     }
+  }
+
+  String _extractErrorMessage(Map<String, dynamic> body) {
+    final directMessage = body['message']?.toString();
+    if (directMessage != null && directMessage.isNotEmpty) {
+      return directMessage;
+    }
+
+    final validationMessages = <String>[];
+    for (final value in body.values) {
+      if (value is List) {
+        validationMessages.addAll(value.map((item) => item.toString()));
+      } else if (value is String && value.isNotEmpty) {
+        validationMessages.add(value);
+      }
+    }
+
+    return validationMessages.join('\n');
   }
 }
