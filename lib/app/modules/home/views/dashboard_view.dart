@@ -61,7 +61,7 @@ class _DashboardViewState extends State<DashboardView> {
       _applyFilters();
     } catch (e) {
       setState(() {
-        _error = 'Gagal memuat data dari server. Pastikan Laravel aktif di port 8000.';
+        _error = 'Gagal memuat data dari server.\n$e';
         _isLoading = false;
       });
     }

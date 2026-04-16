@@ -53,9 +53,9 @@ class _ExploreViewState extends State<ExploreView> {
       _allPosts = results[0] as List<PostModel>;
       _categories = results[1] as List<KategoriModel>;
       _applyFilters();
-    } catch (_) {
+    } catch (e) {
       setState(() {
-        _error = 'Explore belum bisa memuat tipe foto dan postingan dari API.';
+        _error = 'Explore belum bisa memuat tipe foto dan postingan dari API.\n$e';
         _isLoading = false;
       });
     }
@@ -93,9 +93,9 @@ class _ExploreViewState extends State<ExploreView> {
         _allPosts = await _postService.fetchPostsByPhotoType(type.id);
       }
       _applyFilters();
-    } catch (_) {
+    } catch (e) {
       setState(() {
-        _error = 'Gagal memuat postingan untuk tipe foto terpilih.';
+        _error = 'Gagal memuat postingan untuk tipe foto terpilih.\n$e';
         _isLoading = false;
       });
     }

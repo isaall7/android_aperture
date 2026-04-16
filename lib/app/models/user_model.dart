@@ -3,7 +3,7 @@ import 'package:aperturely_app/app/modules/utils/api_helper.dart';
 class UserModel {
   final int id;
   final String name;
-  final String username;
+  final String username; 
   final String? email;
   final String? avatarUrl;
 

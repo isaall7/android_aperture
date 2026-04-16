@@ -9,6 +9,7 @@ import 'package:aperturely_app/app/models/kategori_model.dart';
 import 'package:aperturely_app/app/models/komentar_model.dart';
 import 'package:aperturely_app/app/models/foto_model.dart';
 import 'package:aperturely_app/app/models/user_model.dart';
+import 'package:aperturely_app/app/modules/utils/api.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -32,7 +33,7 @@ class AppColors {
 // API CONFIG
 // ──────────────────────────────────────────────
 
-const String _baseUrl = 'http://127.0.0.1:8000';
+String get _baseUrl => BaseUrl.base;
 
 // ──────────────────────────────────────────────
 // API SERVICE
